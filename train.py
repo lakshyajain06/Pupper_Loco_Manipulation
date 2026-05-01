@@ -3,9 +3,6 @@ import matplotlib.pyplot as plt
 import plotly.express as px
 import plotly.graph_objects as go
 
-# More legible printing from numpy.
-np.set_printoptions(precision=3, suppress=True, linewidth=100)
-
 from datetime import datetime
 import functools
 from IPython.display import HTML
@@ -44,6 +41,8 @@ import sim.utils.utils as utils
 import sim.domain_randomization as domain_randomization
 
 from configs.config import get_total_config
+
+np.set_printoptions(precision=3, suppress=True, linewidth=100)
 
 
 def run_train(reward_config=None):
