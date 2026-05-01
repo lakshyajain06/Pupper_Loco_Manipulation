@@ -35,7 +35,7 @@ import importlib
 import wandb
 import os, json
 
-import utils.export as export
+import Pupper_Loco_Manipulation.utils.export as export
 
 import sim.utils.utils as utils
 import sim.domain_randomization as domain_randomization
