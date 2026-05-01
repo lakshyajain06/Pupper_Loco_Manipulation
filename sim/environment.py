@@ -9,7 +9,10 @@ from typing import *
 import tempfile
 import os
 
-import domain_randomization, rewards, utils.utils
+from mujoco import mjx
+
+import domain_randomization, rewards
+import utils.utils as utils
 
 # More legible printing from numpy.
 np.set_printoptions(precision=3, suppress=True, linewidth=100)
@@ -169,35 +172,9 @@ class PupperV3Env(PipelineEnv):
             use_imu (bool): Whether to use IMU.
         """
 
-        with open(path, 'r') as f:
-            xml_str = f.read()
         
-        # adding a sphere for vis
-        ghost_xml = """
-        <worldbody>
-            <body name="ghost_target" mocap="true">
-                <geom type="sphere" size="0.02" rgba="1 0 0 0.5" contype="0" conaffinity="0"/>
-            </body>
-            <body name="ghost_foot_shadow" mocap="true">
-                <geom type="sphere" size="0.02" rgba="0 0 1 0.3" contype="0" conaffinity="0"/>
-            </body>
-        </worldbody>
-        """
-
-        xml_str = xml_str.replace('</worldbody>', ghost_xml + '</worldbody>')
-
-        # 2. Save to a temporary file so Brax can read it as a path
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.xml', delete=False) as f:
-            f.write(xml_str)
-            temp_path = f.name
-
-        try:
-            # 3. Load using the temporary path
-            sys = mjcf.load(temp_path)
-        finally:
-            # 4. Clean up the temp file
-            if os.path.exists(temp_path):
-                os.remove(temp_path)
+        sys = mjcf.load(path)
+        
 
         self._dt = environment_timestep  # this environment is 50 fps
         sys = sys.tree_replace({"opt.timestep": physics_timestep})
@@ -213,7 +190,7 @@ class PupperV3Env(PipelineEnv):
         )
 
         # override the default joint angles with default_pose
-        sys.mj_model.keyframe("home").qpos[7:] = default_pose
+        sys.mj_model.keyframe("home").qpos[7:19] = default_pose
 
         n_frames = self._dt // sys.opt.timestep
         super().__init__(sys, backend="mjx", n_frames=n_frames)
@@ -233,8 +210,8 @@ class PupperV3Env(PipelineEnv):
         self._init_q = jp.array(sys.mj_model.keyframe("home").qpos)
         self._default_pose = default_pose
         self._desired_abduction_angles = desired_abduction_angles
-        self.lowers = joint_lower_limits
-        self.uppers = joint_upper_limits
+        self.lowers = jp.array(joint_lower_limits)
+        self.uppers = jp.array(joint_upper_limits)
         feet_site = foot_site_names
         feet_site_id = [
             mujoco.mj_name2id(sys.mj_model, mujoco.mjtObj.mjOBJ_SITE.value, f) for f in feet_site
@@ -346,7 +323,7 @@ class PupperV3Env(PipelineEnv):
 
         # sample y pos and flip based on foot
         abs_y = jax.random.uniform(k_y, (1,), minval=foot_y_abs_range[0], maxval=foot_y_abs_range[1])
-        y_sign = 1.0 - (foot_idx * 2.0)
+        y_sign = (foot_idx * 2.0) - 1.0
         t_y = abs_y * y_sign
 
         t_x = jax.random.uniform(k_x, (1,), minval=foot_x_range[0], maxval=foot_x_range[1])
@@ -420,7 +397,7 @@ class PupperV3Env(PipelineEnv):
             "action_buffer": self.initial_action_buffer(),
             "imu_buffer": self.initial_imu_buffer(),
             "last_vel": jp.zeros(12, dtype=float),
-            "command": self.sample_command(sample_command_key),
+            "command": self.sample_command_foot(sample_command_key),
             "last_contact": jp.zeros(4, dtype=bool),
             "feet_air_time": jp.zeros(4, dtype=float),
             "rewards": {k: 0.0 for k in self._reward_config.rewards.scales.keys()},
@@ -474,19 +451,26 @@ class PupperV3Env(PipelineEnv):
         leg_idx = cmd[3].astype(jp.int32)
         anchor_idx = 1 - leg_idx
 
+        feet_site_ids = jp.array(self._feet_site_id)
+        actual_site_id = feet_site_ids[anchor_idx]
+
         # body rotation to define direction of box/point
         torso_quat = pipeline_state.x.rot[0]
-        anchor_pos_world = pipeline_state.site_xpos[self._feet_site_id[anchor_idx]]
+        anchor_pos_world = pipeline_state.site_xpos[actual_site_id]
 
         # calculate world position of target
         target_world_pos = anchor_pos_world + math.rotate(target_local_xyz, torso_quat)
 
-        if hasattr(pipeline_state, 'mocap_pos'):
-            # update render for target pose
-            new_mocap_pos = pipeline_state.mocap_pos.at[0].set(target_world_pos)
-            pipeline_state = pipeline_state.replace(mocap_pos=new_mocap_pos)
+        # print(f"Mocap bodies found: {pipeline_state.mocap_pos.shape[0]}")
 
-        
+        # if hasattr(pipeline_state, 'mocap_pos'):
+        #     # update render for target pose
+        #     new_mocap_pos = pipeline_state.mocap_pos.at[0].set(target_world_pos)
+        #     pipeline_state = pipeline_state.replace(mocap_pos=new_mocap_pos)
+
+        new_q = pipeline_state.q
+        new_q = new_q.at[-14:-11].set(target_world_pos)
+        pipeline_state = pipeline_state.replace(q=new_q)        
 
 
         # Observation data

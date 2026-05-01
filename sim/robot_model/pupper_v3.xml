@@ -57,7 +57,7 @@
     <option cone="pyramidal" impratio="10" iterations="2" ls_iterations="5" timestep="0.004">
         <flag eulerdamp="disable" />
     </option>
-    <compiler angle="radian" meshdir="../meshes/stl/" autolimits="true" />
+    <compiler angle="radian" meshdir="assets/" autolimits="true" />
     <asset>
         <mesh name="BodyV4v70_001" file="BodyV4v70_001.stl" />
         <mesh name="LegAssemblyForFlangedv26_001" file="LegAssemblyForFlangedv26_001.stl" />

@@ -1,5 +1,7 @@
 from ml_collections import config_dict
-
+from policy_configs import get_policy_configs
+from reward_configs import get_reward_configs
+from train_configs import get_train_configs
 
 def get_config():
     """Returns reward config for barkour quadruped environment.
@@ -75,3 +77,19 @@ def get_config():
     )
 
     return default_config
+
+def get_total_config(reward_config=None):
+    
+    training_configs = get_train_configs()
+    policy_configs = get_policy_configs()
+    if reward_config:
+        reward_configs = reward_config
+    else:
+        reward_configs = get_reward_configs
+
+    temp_config = config_dict.ConfigDict()
+    temp_config.training = training_configs
+    temp_config.policy = policy_configs
+    temp_config.reward = reward_configs
+
+    return config_dict.FrozenConfigDict(temp_config)
