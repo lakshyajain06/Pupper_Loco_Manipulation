@@ -37,10 +37,10 @@ import os, json
 
 import Pupper_Loco_Manipulation.utils.export as export
 
-import sim.utils.utils as utils
-import sim.domain_randomization as domain_randomization
+import Pupper_Loco_Manipulation.sim.utils.utils as utils
+import Pupper_Loco_Manipulation.sim.domain_randomization as domain_randomization
 
-from configs.config import get_total_config
+from Pupper_Loco_Manipulation.configs.config import get_total_config
 
 np.set_printoptions(precision=3, suppress=True, linewidth=100)
 
