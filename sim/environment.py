@@ -6,8 +6,10 @@ from brax.envs.base import PipelineEnv, State
 from brax.io import mjcf
 from jax import numpy as jp
 from typing import *
+import tempfile
+import os
 
-from pupperv3_mjx import domain_randomization, rewards, utils
+import domain_randomization, rewards, utils.utils
 
 # More legible printing from numpy.
 np.set_printoptions(precision=3, suppress=True, linewidth=100)
@@ -184,7 +186,19 @@ class PupperV3Env(PipelineEnv):
 
         xml_str = xml_str.replace('</worldbody>', ghost_xml + '</worldbody>')
 
-        sys = mjcf.load(xml_str)
+        # 2. Save to a temporary file so Brax can read it as a path
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.xml', delete=False) as f:
+            f.write(xml_str)
+            temp_path = f.name
+
+        try:
+            # 3. Load using the temporary path
+            sys = mjcf.load(temp_path)
+        finally:
+            # 4. Clean up the temp file
+            if os.path.exists(temp_path):
+                os.remove(temp_path)
+
         self._dt = environment_timestep  # this environment is 50 fps
         sys = sys.tree_replace({"opt.timestep": physics_timestep})
 
