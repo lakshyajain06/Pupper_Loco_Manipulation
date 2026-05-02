@@ -20,7 +20,7 @@ import sys
 from pathlib import Path
 
 # Define source and destination mappings
-LAB_DIR = Path("/home/pi/NYU_ROB_UY_2004/Labs/Lab5")
+LAB_DIR = Path("/home/pi/lakshya_project/Pupper_Loco_Manipulation/pupperv3_deploy")
 NEURAL_CONTROLLER_LAUNCH = Path("/home/pi/pupperv3-monorepo/ros2_ws/src/neural_controller/launch")
 ROS2_WS = Path("/home/pi/pupperv3-monorepo/ros2_ws")
 
@@ -147,6 +147,20 @@ def rebuild_workspace(dry_run=False):
     print(f"🔨 Running build script: {build_script}")
     print(f"📁 Working directory: {ROS2_WS}")
     print()
+
+    # --- Setup temporary ignore ---
+    camera_ros_dir = ROS2_WS / "src/common/camera_ros"
+    ignore_file = camera_ros_dir / "COLCON_IGNORE"
+    created_ignore = False
+    
+    if camera_ros_dir.exists() and not ignore_file.exists():
+        print("🚫 Temporarily ignoring 'camera_ros' for this build...")
+        try:
+            ignore_file.touch()
+            created_ignore = True
+        except Exception as e:
+            print(f"⚠️  Could not create temporary COLCON_IGNORE: {e}")
+    # ------------------------------
     
     try:
         # Run build.sh from the ros2_ws directory
@@ -167,6 +181,16 @@ def rebuild_workspace(dry_run=False):
     except Exception as e:
         print(f"\n❌ ERROR during build: {e}")
         return False
+        
+    finally:
+        # --- Cleanup temporary ignore ---
+        if created_ignore and ignore_file.exists():
+            try:
+                ignore_file.unlink()
+                print("🧹 Cleaned up temporary COLCON_IGNORE file so others aren't affected.")
+            except Exception as e:
+                print(f"⚠️  Could not remove temporary COLCON_IGNORE: {e}")
+        # --------------------------------
 
 
 def wandb_login():
