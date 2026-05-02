@@ -40,6 +40,12 @@ def generate_launch_description():
         ),
     )
 
+    declare_two_leg_arg = DeclareLaunchArgument(
+        name="two_leg",
+        default_value="False", # Matches the false default in your C++ code
+        description="Set to True for multi-leg cycling, False to lock to Left Leg (ID 1).",
+    )
+
 
     #
     # 2. Construct the path to the URDF file using IfElseSubstitution
@@ -222,6 +228,15 @@ def generate_launch_description():
         condition=UnlessCondition(LaunchConfiguration("sim")),
     )
 
+    manip_teleop_node = Node(
+        package="joy_utils",
+        executable="manip_teleop",
+        output="both",
+        parameters=[{
+            "enable_two_leg": LaunchConfiguration("two_leg")
+        }]
+    )
+
 
     #
     # 7. Put them all together
@@ -241,10 +256,11 @@ def generate_launch_description():
         joy_node,
         teleop_twist_joy_node,
         camera_node,
+        manip_teleop_node,
     ]
 
 
     #
     # 8. Return the LaunchDescription with the declared arg + all nodes
     #
-    return LaunchDescription([declare_sim_arg, declare_teleop_arg, *nodes])
+    return LaunchDescription([declare_sim_arg, declare_teleop_arg, declare_two_leg_arg, *nodes])

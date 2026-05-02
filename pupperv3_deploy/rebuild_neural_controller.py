@@ -36,9 +36,19 @@ FILE_MAPPINGS = [
         "description": "Neural controller launch file"
     },
     {
-        "source": LAB_DIR / "estop_controller.cpp",
+        "source": LAB_DIR / "joy_utils/estop_controller.cpp",
         "destination": Path("/home/pi/pupperv3-monorepo/ros2_ws/src/joy_utils/src/estop_controller.cpp"),
         "description": "Emergency stop controller C++ source file"
+    },
+    {
+        "source": LAB_DIR / "joy_utils/manip_teleop.cpp",
+        "destination": Path("/home/pi/pupperv3-monorepo/ros2_ws/src/joy_utils/src/manip_teleop.cpp"),
+        "description": "Manipulator Teleop C++ source"
+    },
+    {
+        "source": LAB_DIR / "joy_utils/CMakeLists.txt",
+        "destination": Path("/home/pi/pupperv3-monorepo/ros2_ws/src/joy_utils/CMakeLists.txt"),
+        "description": "Custom CMakeLists for joy_utils"
     },
     {
         "source": LAB_DIR / "test_policy.json",
