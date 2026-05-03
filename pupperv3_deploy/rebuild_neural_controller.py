@@ -58,7 +58,7 @@ FILE_MAPPINGS = [
     },
     {
         "source": LAB_DIR / "controller/leg_manip_controller.hpp",
-        "destination": Path("/home/pi/pupperv3-monorepo/ros2_ws/src/neural_controller/include/neural_controller/leg_manip_controller.cpp"),
+        "destination": Path("/home/pi/pupperv3-monorepo/ros2_ws/src/neural_controller/include/neural_controller/leg_manip_controller.hpp"),
         "description": "leg pose controller header file"
     },
     {

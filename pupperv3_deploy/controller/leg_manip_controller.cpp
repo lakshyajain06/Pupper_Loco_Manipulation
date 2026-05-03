@@ -1,4 +1,4 @@
-#include "neural_controller/neural_controller.hpp"
+#include "neural_controller/leg_manip_controller.hpp"
 
 #include <algorithm>
 #include <memory>
@@ -14,7 +14,8 @@
 namespace neural_controller {
 LegPoseNeuralController::LegPoseNeuralController()
     : controller_interface::ControllerInterface(),
-      rt_manip_cmd_ptr_ {}
+      rt_manip_cmd_ptr_(nullptr) {}
+
 
 // Check parameter vectors have the correct size
 bool LegPoseNeuralController::check_param_vector_size() {
