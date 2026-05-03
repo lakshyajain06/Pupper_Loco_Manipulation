@@ -27,7 +27,7 @@ public:
        {"neural_controller",
         "neural_controller_three_legged",
         "neural_controller_parkour",
-        "neural_controller_test"});
+        "leg_pose_neural_controller"});
 
 
    // Get parameter values

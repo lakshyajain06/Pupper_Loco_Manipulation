@@ -150,6 +150,19 @@ def generate_launch_description():
         ],
     )
 
+    leg_pose_neural_controller_spawner = Node(
+        package="controller_manager",
+        executable="spawner",
+        arguments=[
+            "leg_pose_neural_controller", # Fixed name
+            "--controller-manager",
+            "/controller_manager",
+            "--controller-manager-timeout",
+            "30",
+            "--inactive",
+        ],
+    )
+
 
     # parkour_robot_controller_spawner = Node(
     #     package="controller_manager",
@@ -231,10 +244,14 @@ def generate_launch_description():
     manip_teleop_node = Node(
         package="joy_utils",
         executable="manip_teleop",
+        name="manip_teleop_node",  # Ensure this matches your YAML block name
         output="both",
-        parameters=[{
-            "enable_two_leg": LaunchConfiguration("two_leg")
-        }]
+        parameters=[
+            robot_controllers,  # This pulls in everything from config.yaml
+            {
+                "enable_two_leg": LaunchConfiguration("two_leg")
+            }
+        ]
     )
 
 
@@ -246,6 +263,7 @@ def generate_launch_description():
         control_node,
         robot_controller_spawner,
         three_legged_robot_controller_spawner,
+        leg_pose_neural_controller_spawner,
         # parkour_robot_controller_spawner,
         test_robot_controller_spawner,
         joint_state_broadcaster_spawner,

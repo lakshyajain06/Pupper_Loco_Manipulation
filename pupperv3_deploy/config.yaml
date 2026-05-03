@@ -382,6 +382,6 @@ manip_teleop_node:
     enable_two_leg: false
     max_speed: 0.1
     left_leg_y_offset: 0.127
-    x_limits: [-0.15, 0.15]
-    y_limits: [-0.15, 0.15]
-    z_limits: [-0.10, 0.10]
+    x_limits: [-0.05, 0.15]
+    y_limits: [0.15, 0.3]
+    z_limits: [-0.05, 0.10]
