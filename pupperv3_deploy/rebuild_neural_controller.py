@@ -50,6 +50,28 @@ FILE_MAPPINGS = [
         "destination": Path("/home/pi/pupperv3-monorepo/ros2_ws/src/joy_utils/CMakeLists.txt"),
         "description": "Custom CMakeLists for joy_utils"
     },
+
+    {
+        "source": LAB_DIR / "controller/leg_manip_controller.cpp",
+        "destination": Path("/home/pi/pupperv3-monorepo/ros2_ws/src/neural_controller/src/leg_manip_controller.cpp"),
+        "description": "leg pose controller C++ source file"
+    },
+    {
+        "source": LAB_DIR / "controller/leg_manip_controller.hpp",
+        "destination": Path("/home/pi/pupperv3-monorepo/ros2_ws/src/neural_controller/include/neural_controller/leg_manip_controller.cpp"),
+        "description": "leg pose controller header file"
+    },
+    {
+        "source": LAB_DIR / "controller/CMakeLists.txt",
+        "destination": Path("/home/pi/pupperv3-monorepo/ros2_ws/src/neural_controller/CMakeLists.txt"),
+        "description": "update the cmake file to have our controller"
+    },
+    {
+        "source": LAB_DIR / "controller/neural_controller.xml",
+        "destination": Path("/home/pi/pupperv3-monorepo/ros2_ws/src/neural_controller/neural_controller.xml"),
+        "description": "update the cmake file to have our controller"
+    },
+
     {
         "source": LAB_DIR / "test_policy.json",
         "destination": NEURAL_CONTROLLER_LAUNCH / "test_policy.json",
